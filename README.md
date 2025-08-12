@@ -1,10 +1,10 @@
-## Quarantine-Malicious-Binary
+## Quarantine-Malicious-Binary.sh
 
-This script quarantines a specified malicious binary by moving it to a secure quarantine directory, providing a JSON-formatted output for integration with security tools like OSSEC/Wazuh.
+This script quarantines a specified malicious binary by moving it to a secure quarantine directory, providing a JSON-formatted output for integration with your SIEM.
 
 ### Overview
 
-The `Quarantine-Malicious-Binary` script moves a specified file to `/var/ossec/quarantine`, disables execution permissions, and records SHA256 hashes before and after the move. It logs all actions and outputs the result in JSON format for active response workflows.
+The `Quarantine-Malicious-Binary.sh` script moves a specified file to `/var/ossec/quarantine`, disables execution permissions, and records SHA256 hashes before and after the move. It logs all actions and outputs the result in JSON format for active response workflows.
 
 ### Script Details
 
@@ -21,7 +21,7 @@ The `Quarantine-Malicious-Binary` script moves a specified file to `/var/ossec/q
 
 #### Command Line Execution
 ```bash
-ARG1="/path/to/malicious_binary" ./Quarantine-Malicious-Binary
+ARG1="/path/to/malicious_binary" ./Quarantine-Malicious-Binary.sh
 ```
 
 #### Parameters
@@ -30,7 +30,7 @@ ARG1="/path/to/malicious_binary" ./Quarantine-Malicious-Binary
 |-----------|------|-------------|
 | `ARG1`    | string | The path to the file to quarantine (required) |
 | `ARLog`   | string | `/var/ossec/active-response/active-responses.log` (output JSON log) |
-| `LogPath` | string | `/tmp/Quarantine-Malicious-Binary-script.log` (detailed execution log) |
+| `LogPath` | string | `/tmp/Quarantine-Malicious-Binary.sh-script.log` (detailed execution log) |
 | `LogMaxKB` | int | 100 | Maximum log file size in KB before rotation |
 | `LogKeep` | int | 5 | Number of rotated log files to retain |
 
@@ -59,7 +59,7 @@ ARG1="/path/to/malicious_binary" ./Quarantine-Malicious-Binary
 {
   "timestamp": "2025-07-18T10:30:45.123Z",
   "host": "HOSTNAME",
-  "action": "Quarantine-Malicious-Binary",
+  "action": "Quarantine-Malicious-Binary.sh",
   "data": {
     "original_path": "/tmp/malware",
     "quarantine_path": "/var/ossec/quarantine/malware.20250718103045.quarantine",
@@ -75,7 +75,7 @@ ARG1="/path/to/malicious_binary" ./Quarantine-Malicious-Binary
 {
   "timestamp": "2025-07-18T10:30:45.123Z",
   "host": "HOSTNAME",
-  "action": "Quarantine-Malicious-Binary",
+  "action": "Quarantine-Malicious-Binary.sh",
   "status": "error",
   "error": "No file specified or not found: /tmp/missing_file",
   "copilot_soar": true
@@ -103,7 +103,7 @@ ARG1="/path/to/malicious_binary" ./Quarantine-Malicious-Binary
 #### Debugging
 Enable verbose logging:
 ```bash
-VERBOSE=1 ARG1="/path/to/malicious_binary" ./Quarantine-Malicious-Binary
+VERBOSE=1 ARG1="/path/to/malicious_binary" ./Quarantine-Malicious-Binary.sh
 ```
 
 ### Contributing

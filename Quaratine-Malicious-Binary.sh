@@ -58,7 +58,7 @@ FilePath="${ARG1:-}"
 if [ -z "$FilePath" ] || [ ! -f "$FilePath" ]; then
   WriteLog "File not found or ARG1 not set: $FilePath" ERROR
   ts=$(date --iso-8601=seconds 2>/dev/null || date '+%Y-%m-%dT%H:%M:%S%z')
-  final_json="{\"timestamp\":\"$ts\",\"host\":\"$HostName\",\"action\":\"$ScriptName\",\"status\":\"error\",\"error\":\"No file specified or not found: $FilePath\",\"copilot_soar\":true}"
+  final_json="{\"timestamp\":\"$ts\",\"host\":\"$HostName\",\"action\":\"$ScriptName\",\"status\":\"error\",\"error\":\"No file specified or not found: $FilePath\",\"copilot_action\":true}"
   tmpfile=$(mktemp)
   printf '%s\n' "$final_json" > "$tmpfile"
   if ! mv -f "$tmpfile" "$ARLog" 2>/dev/null; then mv -f "$tmpfile" "$ARLog.new"; fi
@@ -85,7 +85,7 @@ if mv -f "$FilePath" "$Quarantined" 2>/dev/null; then
 else
   WriteLog "Failed to move $FilePath to quarantine" ERROR
   ts=$(date --iso-8601=seconds 2>/dev/null || date '+%Y-%m-%dT%H:%M:%S%z')
-  final_json="{\"timestamp\":\"$ts\",\"host\":\"$HostName\",\"action\":\"$ScriptName\",\"status\":\"error\",\"error\":\"Failed to move file to quarantine.\",\"copilot_soar\":true}"
+  final_json="{\"timestamp\":\"$ts\",\"host\":\"$HostName\",\"action\":\"$ScriptName\",\"status\":\"error\",\"error\":\"Failed to move file to quarantine.\",\"copilot_action\":true}"
   tmpfile=$(mktemp)
   printf '%s\n' "$final_json" > "$tmpfile"
   if ! mv -f "$tmpfile" "$ARLog" 2>/dev/null; then mv -f "$tmpfile" "$ARLog.new"; fi
@@ -108,7 +108,7 @@ fi
 payload="{\"original_path\":\"$(escape_json "$FilePath")\",\"quarantine_path\":\"$(escape_json "$Quarantined")\",\"sha256_before\":\"$OrigHash\",\"sha256_after\":\"$QuarHash\"}"
 
 ts=$(date --iso-8601=seconds 2>/dev/null || date '+%Y-%m-%dT%H:%M:%S%z')
-final_json="{\"timestamp\":\"$ts\",\"host\":\"$HostName\",\"action\":\"$ScriptName\",\"data\":$payload,\"copilot_soar\":true}"
+final_json="{\"timestamp\":\"$ts\",\"host\":\"$HostName\",\"action\":\"$ScriptName\",\"data\":$payload,\"copilot_action\":true}"
 
 tmpfile=$(mktemp)
 printf '%s\n' "$final_json" > "$tmpfile"

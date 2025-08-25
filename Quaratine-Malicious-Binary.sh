@@ -8,7 +8,8 @@ LogMaxKB=100
 LogKeep=5
 HostName="$(hostname)"
 runStart=$(date +%s)
-
+# Prefer ARG1 from Velociraptor, fallback to $1 (positional)
+FilePath="${ARG1:-${1:-}}"
 WriteLog() {
   Message="$1"; Level="${2:-INFO}"
   ts="$(date '+%Y-%m-%d %H:%M:%S')"
@@ -35,30 +36,20 @@ RotateLog() {
 }
 
 escape_json() {
-  if command -v python3 >/dev/null 2>&1; then
-    python3 -c "import json,sys; print(json.dumps(sys.stdin.read())[1:-1])"
-  else
-    printf '%s' "$1" | sed 's/\\/\\\\/g; s/"/\\"/g'
-  fi
+  # Portable escaper (no python requirement)
+  printf '%s' "$1" | sed 's/\\/\\\\/g; s/"/\\"/g'
 }
 
 RotateLog
-
-if ! rm -f "$ARLog" 2>/dev/null; then
-  WriteLog "Failed to clear $ARLog (might be locked)" WARN
-else
-  : > "$ARLog"
-  WriteLog "Active response log cleared for fresh run." INFO
-fi
-
 WriteLog "=== SCRIPT START : $ScriptName ==="
 
-FilePath="${ARG1:-}"
 
-if [ -z "$FilePath" ] || [ ! -f "$FilePath" ]; then
-  WriteLog "File not found or ARG1 not set: $FilePath" ERROR
+
+# Validate
+if [ -z "${FilePath:-}" ] || [ ! -f "$FilePath" ]; then
+  WriteLog "File not found or ARG1 not set: ${FilePath:-<empty>}" ERROR
   ts=$(date --iso-8601=seconds 2>/dev/null || date '+%Y-%m-%dT%H:%M:%S%z')
-  final_json="{\"timestamp\":\"$ts\",\"host\":\"$HostName\",\"action\":\"$ScriptName\",\"status\":\"error\",\"error\":\"No file specified or not found: $FilePath\",\"copilot_action\":true}"
+  final_json="{\"timestamp\":\"$ts\",\"host\":\"$HostName\",\"action\":\"$ScriptName\",\"status\":\"error\",\"error\":\"No file specified or not found: $(escape_json "${FilePath:-}")\",\"copilot_action\":true}"
   tmpfile=$(mktemp)
   printf '%s\n' "$final_json" > "$tmpfile"
   if ! mv -f "$tmpfile" "$ARLog" 2>/dev/null; then mv -f "$tmpfile" "$ARLog.new"; fi
@@ -85,7 +76,7 @@ if mv -f "$FilePath" "$Quarantined" 2>/dev/null; then
 else
   WriteLog "Failed to move $FilePath to quarantine" ERROR
   ts=$(date --iso-8601=seconds 2>/dev/null || date '+%Y-%m-%dT%H:%M:%S%z')
-  final_json="{\"timestamp\":\"$ts\",\"host\":\"$HostName\",\"action\":\"$ScriptName\",\"status\":\"error\",\"error\":\"Failed to move file to quarantine.\",\"copilot_action\":true}"
+  final_json="{\"timestamp\":\"$ts\",\"host\":\"$HostName\",\"action\":\"$ScriptName\",\"status\":\"error\",\"error\":\"Failed to move file to quarantine\",\"copilot_action\":true}"
   tmpfile=$(mktemp)
   printf '%s\n' "$final_json" > "$tmpfile"
   if ! mv -f "$tmpfile" "$ARLog" 2>/dev/null; then mv -f "$tmpfile" "$ARLog.new"; fi
@@ -96,7 +87,7 @@ chmod a-x "$Quarantined" 2>/dev/null || true
 if [ -f "$Quarantined" ]; then
   if command -v sha256sum >/dev/null 2>&1; then
     QuarHash=$(sha256sum "$Quarantined" | awk '{print $1}')
-  elif command -v shasum >/dev/null 2>&1; then
+  elif command -v shasum >/devnull 2>&1; then
     QuarHash=$(shasum -a 256 "$Quarantined" | awk '{print $1}')
   else
     QuarHash="(sha256sum not available)"

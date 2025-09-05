@@ -9,7 +9,8 @@
       "type": "string",
       "required": true,
       "description": "Full path to the suspected malicious binary to quarantine.",
-      "default": null
+      "default": null,
+      "arg_position" : "1"
     },
     {
       "name": "ARLog",

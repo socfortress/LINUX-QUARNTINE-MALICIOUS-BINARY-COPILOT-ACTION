@@ -13,7 +13,7 @@
       "arg_position" : "1"
     },
   ],
-  "repo_url": "https://raw.githubusercontent.com/socfortress/LINUX-QUARNTINE-MALICIOUS-BINARY-COPILOT-ACTION/refs/heads/main/Quarantine-Malicious-Binary.sh",
+  "repo_url": "https://raw.githubusercontent.com/socfortress/LINUX-QUARNTINE-MALICIOUS-BINARY-COPILOT-ACTION/refs/heads/main/Quaratine-Malicious-Binary.sh",
   "script_name": "Quarantine-Malicious-Binary.sh",
   "version": "1.0.0",
   "last_updated": "2025-08-23T00:00:00Z"
